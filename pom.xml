@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
@@ -8,12 +7,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>edu.umg.programacion2.proyecto</groupId>
-
     <artifactId>libreria-crud</artifactId>
-
     <version>1.0-SNAPSHOT</version>
-
     <packaging>pom</packaging>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <modules>
         <module>libreria-core</module>
