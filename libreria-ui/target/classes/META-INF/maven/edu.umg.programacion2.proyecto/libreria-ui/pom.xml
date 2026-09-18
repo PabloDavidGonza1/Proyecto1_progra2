@@ -12,16 +12,18 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>libreria-core</artifactId>
+    <artifactId>libreria-ui</artifactId>
 
     <packaging>jar</packaging>
 
-   <dependencies>
-    <dependency>
-        <groupId>org.mariadb.jdbc</groupId>
-        <artifactId>mariadb-java-client</artifactId>
-        <version>3.5.1</version>
-    </dependency>
-</dependencies>
+    <dependencies>
+
+        <dependency>
+            <groupId>edu.umg.programacion2.proyecto</groupId>
+            <artifactId>libreria-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
 
 </project>
