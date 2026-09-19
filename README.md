@@ -50,3 +50,18 @@ un mensaje de error.
 4. Correr `MainUI.java`.
 
 ## Se agrego el proyecto a la rama del parcial
+
+## Mejoras agregadas
+
+**Mejora 2 —  Fecha de ingreso al catálogo**
+Se agregó el campo `fecha_ingreso` a la tabla `libro` y a toda la aplicación
+(modelo, DAO e interfaz). Cada libro ahora registra la fecha en la que entró
+al catálogo, visible en la tabla y editable desde el formulario con un
+selector de fecha (`JSpinner`).
+
+**Mejora 7 — Resumen con conteo por condición**
+Se agregó el botón **Ver Resumen** en la pestaña Catálogo. Al presionarlo,
+recorre la lista devuelta por `listarTodos()` con un ciclo `for` y un
+contador manual (sin usar `COUNT(*)` en SQL), mostrando el total de libros
+registrados y cuántos están agotados (existencias en cero), junto con el
+título de cada uno de esos libros.
