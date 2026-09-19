@@ -351,7 +351,7 @@ public class VentanaPrincipal extends JFrame {
     }
 
     // ---------------------------------------------------------
-    //  MEJORA 2: Resumen con conteo por condición (recorrido manual)
+    //  MEJORA 2: Resumen con conteo por condición (recorrido manual) este metodo resuelve la mejora 2 del examen
     // ---------------------------------------------------------
     private void mostrarResumenConCondicion() {
         try {
@@ -359,16 +359,22 @@ public class VentanaPrincipal extends JFrame {
 
             int total = 0;
             int cumplenCondicion = 0;
+            StringBuilder nombresAgotados = new StringBuilder();
 
             for (Libro libro : libros) {
                 total++;
-                if (libro.getExistencias() > 5) {   // <-- ajusta la condición si tu examen pide otra
+                if (libro.getExistencias() == 0) {
                     cumplenCondicion++;
+                    nombresAgotados.append("- ").append(libro.getTitulo()).append("\n");
                 }
             }
 
             String mensaje = "Total de libros registrados: " + total + "\n"
-                    + "Libros con más de 5 existencias: " + cumplenCondicion;
+                    + "Libros agotados (existencias = 0): " + cumplenCondicion;
+
+            if (cumplenCondicion > 0) {
+                mensaje += "\n\nTítulos agotados:\n" + nombresAgotados;
+            }
 
             JOptionPane.showMessageDialog(this, mensaje,
                     "Resumen del catálogo", JOptionPane.INFORMATION_MESSAGE);
