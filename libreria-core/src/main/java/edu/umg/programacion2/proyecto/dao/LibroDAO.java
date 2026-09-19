@@ -19,7 +19,7 @@ public class LibroDAO {
 
     public Libro crear(Libro libro) throws SQLException {
         String sql = "INSERT INTO libro (titulo, autor, categoria, precio, existencias, anio_publicacion) "
-                   + "VALUES (?, ?, ?, ?, ?, ?)";
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = conectar();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -29,6 +29,7 @@ public class LibroDAO {
             ps.setBigDecimal(4, libro.getPrecio());
             ps.setInt(5, libro.getExistencias());
             ps.setInt(6, libro.getAnioPublicacion());
+            ps.setDate(7, java.sql.Date.valueOf(libro.getFechaIngreso()));
 
             ps.executeUpdate();
 
@@ -73,7 +74,7 @@ public class LibroDAO {
 
     public boolean actualizar(Libro libro) throws SQLException {
         String sql = "UPDATE libro SET titulo=?, autor=?, categoria=?, precio=?, "
-                   + "existencias=?, anio_publicacion=? WHERE id=?";
+                   + "existencias=?, anio_publicacion=?, fecha_ingreso=?, WHERE id=?";
         try (Connection con = conectar();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -83,7 +84,8 @@ public class LibroDAO {
             ps.setBigDecimal(4, libro.getPrecio());
             ps.setInt(5, libro.getExistencias());
             ps.setInt(6, libro.getAnioPublicacion());
-            ps.setInt(7, libro.getId());
+            ps.setDate(7, java.sql.Date.valueOf(libro.getFechaIngreso()));
+            ps.setInt(8, libro.getId());
 
             return ps.executeUpdate() > 0;
         }
@@ -107,7 +109,8 @@ public class LibroDAO {
                 rs.getString("categoria"),
                 rs.getBigDecimal("precio"),
                 rs.getInt("existencias"),
-                rs.getInt("anio_publicacion")
+                rs.getInt("anio_publicacion"),
+                rs.getDate("fecha_ingreso").toLocalDate()
         );
     }
 }
