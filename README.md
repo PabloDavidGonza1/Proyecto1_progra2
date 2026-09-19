@@ -48,3 +48,5 @@ un mensaje de error.
 2. Poner el usuario y contraseña correctos en `LibroDAO.java`.
 3. Instalar el módulo core: `mvn install` dentro de `libreria-core`.
 4. Correr `MainUI.java`.
+
+## Se agrego el proyecto a la rama del parcial
