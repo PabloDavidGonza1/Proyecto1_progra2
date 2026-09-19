@@ -16,9 +16,12 @@ import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Year;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 public class VentanaPrincipal extends JFrame {
@@ -52,7 +55,7 @@ public class VentanaPrincipal extends JFrame {
 
     // --- Tab Registrar (solo libros nuevos) ---
     private JTextField txtTituloReg, txtAutorReg, txtCategoriaReg, txtPrecioReg;
-    private JSpinner spnExistenciasReg, spnAnioReg;
+    private JSpinner spnExistenciasReg, spnAnioReg, spnFechaIngresoReg;
 
     // --- Tab Resumen ---
     private JLabel lblTotalLibros, lblTotalEjemplares, lblValorInventario, lblAgotados;
@@ -63,8 +66,8 @@ public class VentanaPrincipal extends JFrame {
     public VentanaPrincipal() {
         super("Sistema de Gestión de Catálogo — Librería");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(980, 620);
-        setMinimumSize(new Dimension(820, 520));
+        setSize(1020, 640);
+        setMinimumSize(new Dimension(860, 540));
         setLocationRelativeTo(null);
 
         initComponents();
@@ -129,7 +132,7 @@ public class VentanaPrincipal extends JFrame {
         menuAyuda.setMnemonic(KeyEvent.VK_Y);
         JMenuItem itemAcerca = new JMenuItem("Acerca de");
         itemAcerca.addActionListener(e -> JOptionPane.showMessageDialog(this,
-                "Sistema de Gestión de Catálogo de Libros\nProyecto Individual — CRUD Swing + Maven + MySQL/MariaDB",
+                "Sistema de Gestión de Catálogo de Libros\nProyecto Individual — CRUD Swing + Maven + MariaDB",
                 "Acerca de", JOptionPane.INFORMATION_MESSAGE));
         menuAyuda.add(itemAcerca);
 
@@ -218,8 +221,13 @@ public class VentanaPrincipal extends JFrame {
             setEstado("Listado actualizado.");
         });
 
+        JButton btnVerResumen = new JButton("Ver Resumen");
+        estilizarBotonSecundario(btnVerResumen);
+        btnVerResumen.addActionListener(e -> mostrarResumenConCondicion());
+
         JPanel botonesArriba = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         botonesArriba.setOpaque(false);
+        botonesArriba.add(btnVerResumen);
         botonesArriba.add(btnRefrescar);
         botonesArriba.add(btnNuevoLibro);
 
@@ -228,7 +236,7 @@ public class VentanaPrincipal extends JFrame {
         panelBusqueda.add(botonesArriba, BorderLayout.EAST);
 
         modeloTabla = new DefaultTableModel(
-                new Object[]{"ID", "Título", "Autor", "Categoría", "Precio", "Existencias", "Año"}, 0) {
+                new Object[]{"ID", "Título", "Autor", "Categoría", "Precio", "Existencias", "Año", "Fecha ingreso"}, 0) {
             @Override
             public boolean isCellEditable(int row, int col) { return false; }
 
@@ -286,6 +294,7 @@ public class VentanaPrincipal extends JFrame {
         tabla.getColumnModel().getColumn(0).setPreferredWidth(40);
         tabla.getColumnModel().getColumn(1).setPreferredWidth(220);
         tabla.getColumnModel().getColumn(3).setPreferredWidth(100);
+        tabla.getColumnModel().getColumn(7).setPreferredWidth(110);
 
         // Doble clic abre la ventana emergente de edición
         tabla.addMouseListener(new MouseAdapter() {
@@ -342,6 +351,34 @@ public class VentanaPrincipal extends JFrame {
     }
 
     // ---------------------------------------------------------
+    //  MEJORA 2: Resumen con conteo por condición (recorrido manual)
+    // ---------------------------------------------------------
+    private void mostrarResumenConCondicion() {
+        try {
+            List<Libro> libros = dao.listarTodos();
+
+            int total = 0;
+            int cumplenCondicion = 0;
+
+            for (Libro libro : libros) {
+                total++;
+                if (libro.getExistencias() > 5) {   // <-- ajusta la condición si tu examen pide otra
+                    cumplenCondicion++;
+                }
+            }
+
+            String mensaje = "Total de libros registrados: " + total + "\n"
+                    + "Libros con más de 5 existencias: " + cumplenCondicion;
+
+            JOptionPane.showMessageDialog(this, mensaje,
+                    "Resumen del catálogo", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (SQLException e) {
+            mostrarError(this, "No se pudo generar el resumen.", e);
+        }
+    }
+
+    // ---------------------------------------------------------
     //  TAB 2: REGISTRAR (solo libros nuevos)
     // ---------------------------------------------------------
     private JPanel crearPanelRegistrar() {
@@ -377,6 +414,10 @@ public class VentanaPrincipal extends JFrame {
         ((JSpinner.DefaultEditor) spnExistenciasReg.getEditor()).getTextField().setColumns(10);
         ((JSpinner.DefaultEditor) spnAnioReg.getEditor()).getTextField().setColumns(10);
 
+        spnFechaIngresoReg = new JSpinner(new SpinnerDateModel());
+        spnFechaIngresoReg.setEditor(new JSpinner.DateEditor(spnFechaIngresoReg, "yyyy-MM-dd"));
+        spnFechaIngresoReg.setValue(new Date());
+
         int fila = 0;
         agregarCampo(form, gbc, fila++, "Título:", txtTituloReg, KeyEvent.VK_T);
         agregarCampo(form, gbc, fila++, "Autor:", txtAutorReg, KeyEvent.VK_R);
@@ -384,6 +425,7 @@ public class VentanaPrincipal extends JFrame {
         agregarCampo(form, gbc, fila++, "Precio (Q):", txtPrecioReg, KeyEvent.VK_P);
         agregarCampoSpinner(form, gbc, fila++, "Existencias:", spnExistenciasReg);
         agregarCampoSpinner(form, gbc, fila++, "Año de publicación:", spnAnioReg);
+        agregarCampoSpinner(form, gbc, fila++, "Fecha de ingreso:", spnFechaIngresoReg);
 
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         panelBotones.setOpaque(false);
@@ -424,6 +466,7 @@ public class VentanaPrincipal extends JFrame {
         txtPrecioReg.setText("");
         spnExistenciasReg.setValue(0);
         spnAnioReg.setValue(Year.now().getValue());
+        spnFechaIngresoReg.setValue(new Date());
         marcarValido(txtTituloReg);
         marcarValido(txtAutorReg);
         marcarValido(txtPrecioReg);
@@ -432,7 +475,7 @@ public class VentanaPrincipal extends JFrame {
 
     private void registrarNuevoLibro() {
         Libro libro = validarFormulario(this, txtTituloReg, txtAutorReg, txtCategoriaReg,
-                txtPrecioReg, spnExistenciasReg, spnAnioReg, null);
+                txtPrecioReg, spnExistenciasReg, spnAnioReg, spnFechaIngresoReg, null);
         if (libro == null) return;
 
         try {
@@ -455,7 +498,7 @@ public class VentanaPrincipal extends JFrame {
         String tituloActual = String.valueOf(modeloTabla.getValueAt(filaModelo, 1));
 
         JDialog dialogo = new JDialog(this, "Editar libro — " + tituloActual, true);
-        dialogo.setSize(480, 420);
+        dialogo.setSize(480, 460);
         dialogo.setLocationRelativeTo(this);
         dialogo.setLayout(new BorderLayout());
         dialogo.getContentPane().setBackground(FONDO);
@@ -482,12 +525,19 @@ public class VentanaPrincipal extends JFrame {
         JSpinner spnExistencias = new JSpinner(new SpinnerNumberModel(0, 0, 999999, 1));
         JSpinner spnAnio = new JSpinner(new SpinnerNumberModel(anioActual, 1500, anioActual, 1));
 
+        JSpinner spnFechaIngreso = new JSpinner(new SpinnerDateModel());
+        spnFechaIngreso.setEditor(new JSpinner.DateEditor(spnFechaIngreso, "yyyy-MM-dd"));
+
         txtTitulo.setText(String.valueOf(modeloTabla.getValueAt(filaModelo, 1)));
         txtAutor.setText(String.valueOf(modeloTabla.getValueAt(filaModelo, 2)));
         txtCategoria.setText(String.valueOf(modeloTabla.getValueAt(filaModelo, 3)));
         txtPrecio.setText(modeloTabla.getValueAt(filaModelo, 4).toString());
         spnExistencias.setValue(modeloTabla.getValueAt(filaModelo, 5));
         spnAnio.setValue(modeloTabla.getValueAt(filaModelo, 6));
+
+        LocalDate fechaExistente = LocalDate.parse(String.valueOf(modeloTabla.getValueAt(filaModelo, 7)));
+        Date fechaComoDate = Date.from(fechaExistente.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        spnFechaIngreso.setValue(fechaComoDate);
 
         int fila = 0;
         agregarCampo(form, gbc, fila++, "Título:", txtTitulo, KeyEvent.VK_T);
@@ -496,6 +546,7 @@ public class VentanaPrincipal extends JFrame {
         agregarCampo(form, gbc, fila++, "Precio (Q):", txtPrecio, KeyEvent.VK_P);
         agregarCampoSpinner(form, gbc, fila++, "Existencias:", spnExistencias);
         agregarCampoSpinner(form, gbc, fila++, "Año de publicación:", spnAnio);
+        agregarCampoSpinner(form, gbc, fila++, "Fecha de ingreso:", spnFechaIngreso);
 
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         panelBotones.setOpaque(false);
@@ -504,7 +555,7 @@ public class VentanaPrincipal extends JFrame {
         estilizarBotonAccion(btnActualizar, PRIMARIO);
         btnActualizar.addActionListener(e -> {
             Libro libro = validarFormulario(dialogo, txtTitulo, txtAutor, txtCategoria,
-                    txtPrecio, spnExistencias, spnAnio, id);
+                    txtPrecio, spnExistencias, spnAnio, spnFechaIngreso, id);
             if (libro == null) return;
 
             try {
@@ -676,7 +727,8 @@ public class VentanaPrincipal extends JFrame {
             for (Libro l : libros) {
                 modeloTabla.addRow(new Object[]{
                         l.getId(), l.getTitulo(), l.getAutor(), l.getCategoria(),
-                        l.getPrecio(), l.getExistencias(), l.getAnioPublicacion()
+                        l.getPrecio(), l.getExistencias(), l.getAnioPublicacion(),
+                        l.getFechaIngreso().toString()
                 });
             }
             actualizarContador();
@@ -693,7 +745,8 @@ public class VentanaPrincipal extends JFrame {
      */
     private Libro validarFormulario(Component parent, JTextField txtTitulo, JTextField txtAutor,
                                      JTextField txtCategoria, JTextField txtPrecio,
-                                     JSpinner spnExistencias, JSpinner spnAnio, Integer idExistente) {
+                                     JSpinner spnExistencias, JSpinner spnAnio,
+                                     JSpinner spnFechaIngreso, Integer idExistente) {
         marcarValido(txtTitulo);
         marcarValido(txtAutor);
         marcarValido(txtPrecio);
@@ -734,7 +787,12 @@ public class VentanaPrincipal extends JFrame {
         int existencias = (Integer) spnExistencias.getValue();
         int anio = (Integer) spnAnio.getValue();
 
-        Libro libro = new Libro(titulo, autor, categoria, precio, existencias, anio);
+        Date fechaSeleccionada = (Date) spnFechaIngreso.getValue();
+        LocalDate fechaIngreso = fechaSeleccionada.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        Libro libro = new Libro(titulo, autor, categoria, precio, existencias, anio, fechaIngreso);
         if (idExistente != null) {
             libro.setId(idExistente);
         }
