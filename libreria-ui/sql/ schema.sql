@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS libro (
     precio            DECIMAL(10,2) NOT NULL,
     existencias       INT NOT NULL DEFAULT 0,
     anio_publicacion  INT NOT NULL,
+    fecha_ingreso     DATE NOT NULL DEFAULT CURRENT_DATE,
     CONSTRAINT chk_precio_positivo CHECK (precio > 0),
     CONSTRAINT chk_existencias_no_negativas CHECK (existencias >= 0)
 );
