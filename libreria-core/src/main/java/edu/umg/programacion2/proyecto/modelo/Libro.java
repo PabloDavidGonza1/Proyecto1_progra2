@@ -1,6 +1,7 @@
 package edu.umg.programacion2.proyecto.modelo;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class Libro {
 
@@ -11,12 +12,13 @@ public class Libro {
     private BigDecimal precio;
     private int existencias;
     private int anioPublicacion;
+    private LocalDate fechaIngreso;
 
     public Libro() {
     }
 
     public Libro(String titulo, String autor, String categoria,
-                 BigDecimal precio, int existencias, int anioPublicacion) {
+                 BigDecimal precio, int existencias, int anioPublicacion, LocalDate fechaIngreso) {
 
         this.titulo = titulo;
         this.autor = autor;
@@ -24,10 +26,11 @@ public class Libro {
         this.precio = precio;
         this.existencias = existencias;
         this.anioPublicacion = anioPublicacion;
+        this.fechaIngreso = fechaIngreso;
     }
 
     public Libro(int id, String titulo, String autor, String categoria,
-                 BigDecimal precio, int existencias, int anioPublicacion) {
+                 BigDecimal precio, int existencias, int anioPublicacion, LocalDate fechaIngreso) {
 
         this.id = id;
         this.titulo = titulo;
@@ -36,6 +39,7 @@ public class Libro {
         this.precio = precio;
         this.existencias = existencias;
         this.anioPublicacion = anioPublicacion;
+        this.fechaIngreso = fechaIngreso;
     }
 
     public int getId() {
@@ -93,6 +97,14 @@ public class Libro {
     public void setAnioPublicacion(int anioPublicacion) {
         this.anioPublicacion = anioPublicacion;
     }
+    
+    public LocalDate getFechaIngreso() { 
+    	return fechaIngreso; 
+    }
+    public void setFechaIngreso(LocalDate fechaIngreso) {
+    	this.fechaIngreso = fechaIngreso; 
+    }
+
 
     @Override
     public String toString() {
