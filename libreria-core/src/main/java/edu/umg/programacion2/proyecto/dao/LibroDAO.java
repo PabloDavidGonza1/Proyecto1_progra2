@@ -18,7 +18,8 @@ public class LibroDAO {
     }
 
     public Libro crear(Libro libro) throws SQLException {
-        String sql = "INSERT INTO libro (titulo, autor, categoria, precio, existencias, anio_publicacion) "
+        String sql = "INSERT INTO libro "
+                   + "(titulo, autor, categoria, precio, existencias, anio_publicacion, fecha_ingreso) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = conectar();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -73,8 +74,9 @@ public class LibroDAO {
     }
 
     public boolean actualizar(Libro libro) throws SQLException {
-        String sql = "UPDATE libro SET titulo=?, autor=?, categoria=?, precio=?, "
-                   + "existencias=?, anio_publicacion=?, fecha_ingreso=?, WHERE id=?";
+        String sql = "UPDATE libro SET "
+                   + "titulo=?, autor=?, categoria=?, precio=?, existencias=?, anio_publicacion=?, fecha_ingreso=? "
+                   + "WHERE id=?";
         try (Connection con = conectar();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
